@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<robot name="camera"
+     xmlns:xacro="http://ros.org/wiki/xacro">
+
+     <xacro:macro name="depth_camera" params="name parent *origin">
+
+          <joint name="${name}_fix_joint" type="fixed">
+               <xacro:insert_block name="origin" />
+               <parent link="${parent}"/>
+               <child link="${name}_fix_link"/>
+          </joint>
+
+          <link name="${name}_fix_link">
+               <collision>
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <geometry>
+                         <box size="0.001 0.001 0.001" />
+                    </geometry>
+               </collision>
+
+               <visual>
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <geometry>
+                         <box size="0.001 0.001 0.001" />
+                    </geometry>
+               </visual>
+
+               <inertial>
+                    <mass value="1e-5" />
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+               </inertial>
+          </link>
+
+          <joint name="${name}_joint" type="fixed">
+               <parent link="${name}_fix_link"/>
+               <child link="${name}_link"/>
+               <origin xyz="0 0 0" rpy="0 0 0"/>
+          </joint>
+
+          <link name="${name}_link" />
+
+          <joint name="dummy_${name}_joint" type="fixed">
+               <parent link="${name}_link"/>
+               <child link="tecdron/base_footprint/${name}"/>
+               <origin xyz="0 0 0" rpy="0 0 0"/>
+          </joint>
+
+          <link name="tecdron/base_footprint/${name}" />
+
+    <gazebo reference="${name}_link">
+          <sensor type="depth_camera" name="${name}">
+               <update_rate>10</update_rate>
+               <topic>${name}_topic</topic>
+               <camera>
+                 <horizontal_fov>1.05</horizontal_fov>
+                 <image>
+                   <width>256</width>
+                   <height>256</height>
+                   <format>R_FLOAT32</format>
+                 </image>
+                 <clip>
+                   <near>0.1</near>
+                   <far>10.0</far>
+                 </clip>
+               </camera>
+          </sensor>
+     </gazebo>
+
+
+</xacro:macro>
+
+</robot>

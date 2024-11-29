@@ -1,0 +1,78 @@
+FROM nvidia/cuda:12.4.0-base-ubuntu22.04
+
+# Set up proxy
+#ENV http_proxy=http://wenis:wenis123@10.1.60.11:80
+#ENV https_proxy=http://wenis:wenis123@10.1.60.11:80
+
+# Minimal setup
+RUN apt-get update \
+ && apt-get install -y locales lsb-release \
+ && rm -rf /var/lib/apt/lists/*
+
+ARG DEBIAN_FRONTEND=noninteractive
+RUN locale-gen en_US en_US.UTF-8 \
+ && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+
+ENV LANG=en_US.UTF-8
+
+SHELL [ "/bin/bash" , "-c" ]
+
+# Install prerequisites
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    curl \
+    gnupg2 \
+    lsb-release \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN curl https://google.com
+
+
+# Set up ROS 2 repository
+RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg \
+ && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu jammy main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
+
+# Install ROS 2 packages
+RUN apt-get update --allow-unauthenticated
+RUN apt-get install -Y libcanberra-gtk-module libcanberra-gtk3-module
+RUN apt-get install -y python3-opencv
+
+RUN apt-get install -y ros-humble-desktop
+RUN apt-get install -y \
+    ros-humble-desktop \
+    ros-humble-ros-gz \
+    python3-rosdep \
+    python3-colcon-common-extensions \
+    git \
+    ros-humble-ros2-control \
+    ros-humble-ign-ros2-control \
+    ros-humble-joint-state-broadcaster \
+    ros-humble-joint-state-publisher \
+    ros-humble-joint-trajectory-controller \
+    ros-humble-velocity-controllers \
+    ros-humble-pointcloud-to-laserscan \
+    ros-humble-perception \
+    ros-humble-cv-bridge \
+
+ && rm -rf /var/lib/apt/lists/*
+
+
+
+# Additional configuration
+#RUN rosdep updates
+
+RUN mkdir -p /tecdron_ws/src
+WORKDIR /tecdron_ws
+
+
+
+# colocar aqui o git clone desse meu projeto
+RUN cd src && git clone https://github.com/wenisbelle/Tecdron.git
+RUN source /opt/ros/humble/setup.bash
+#RUN colcon build
+#RUN source /tecdron_ws/install/setup.bash
+
+#RUN echo "source /tecdron_ws/install/setup.bash" >> ~/.bashrc
+
+
+

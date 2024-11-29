@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+
+<robot name="tecdron"
+	xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:include filename="$(find robot_description)/urdf/wheels/omni_wheel.xacro" />
+	<xacro:include filename="$(find robot_description)/urdf/wheels/omni_wheel_visual.xacro" />
+	<xacro:include filename="$(find robot_description)/urdf/base/tecdron_base.xacro" />
+	<xacro:include filename="$(find robot_description)/urdf/sick/sick_s300.xacro" />
+	<xacro:include filename="$(find robot_description)/urdf/sick/cameras.xacro" />
+	<xacro:include filename="$(find robot_description)/urdf/sick/depth_camera.xacro" />
+	<xacro:include filename="$(find robot_description)/urdf/sick/sick_s300_gazebo.xacro" />
+	<xacro:include filename="$(find robot_description)/urdf/base/tecdron_base_gazebo.xacro" />
+
+	<xacro:property name="wheel_offset_x" value="0.375" />
+	<xacro:property name="wheel_offset_y" value="0.35" />
+	<xacro:property name="wheel_offset_z" value="0.0" />
+	<xacro:property name="PI" value="3.1415926535897931" />
+
+	
+	<xacro:tecdron_base/>
+	
+	<xacro:omni_wheel prefix="tecdron_front_left" parent="base_link">
+		<origin xyz="${wheel_offset_x} ${wheel_offset_y} ${wheel_offset_z}" rpy="0 0 ${PI/4}"/>
+	</xacro:omni_wheel>	
+	
+	<xacro:omni_wheel prefix="tecdron_front_right" parent="base_link">
+		<origin xyz="${wheel_offset_x} -${wheel_offset_y} ${wheel_offset_z}" rpy="0 0 ${-PI/4}"/>
+	</xacro:omni_wheel>
+	
+	<xacro:omni_wheel prefix="tecdron_back_right" parent="base_link">
+		<origin xyz="-${wheel_offset_x} -${wheel_offset_y} ${wheel_offset_z}" rpy="0 0 ${PI/4}"/>
+	</xacro:omni_wheel>
+	
+	<xacro:omni_wheel prefix="tecdron_back_left" parent="base_link">
+		<origin xyz="-${wheel_offset_x} ${wheel_offset_y} ${wheel_offset_z}" rpy="0 0 ${-PI/4}"/>
+	</xacro:omni_wheel>
+	
+	<!--Visual-->
+	
+	<xacro:omni_wheel_visual prefix="tecdron_front_left" parent="base_link">
+		<origin xyz="${wheel_offset_x} ${wheel_offset_y} ${wheel_offset_z}" rpy="0 0 0"/>
+	</xacro:omni_wheel_visual>	
+	
+	<xacro:omni_wheel_visual prefix="tecdron_front_right" parent="base_link">
+		<origin xyz="${wheel_offset_x} -${wheel_offset_y} ${wheel_offset_z}" rpy="0 0 0"/>
+	</xacro:omni_wheel_visual>
+	
+	<xacro:omni_wheel_visual prefix="tecdron_back_right" parent="base_link">
+		<origin xyz="-${wheel_offset_x} -${wheel_offset_y} ${wheel_offset_z}" rpy="0 0 0"/>
+	</xacro:omni_wheel_visual>
+	
+	<xacro:omni_wheel_visual prefix="tecdron_back_left" parent="base_link">
+		<origin xyz="-${wheel_offset_x} ${wheel_offset_y} ${wheel_offset_z}" rpy="0 0 0"/>
+	</xacro:omni_wheel_visual>
+	
+	<xacro:omni_steering/>
+
+	<xacro:sensor_sick_s300_gazebo/>
+	
+	<xacro:sensor_sick_s300 name="front_sick" parent="base_link" color="white">
+		<origin xyz="0.576 0.406 0.145" rpy="${PI} 0 ${PI/4}"/>
+	</xacro:sensor_sick_s300>
+
+	<xacro:sensor_sick_s300 name="rear_sick" parent="base_link" color="white">
+		<origin xyz="-0.576 -0.406 0.145" rpy="${PI} 0 -${(3*PI)/4}"/>
+	</xacro:sensor_sick_s300>
+
+	<xacro:cameras name="front_camera" parent="base_link">
+		<origin xyz="0.576 0.0 0.0" rpy="0 0 0"/>
+	</xacro:cameras>
+
+	<xacro:depth_camera name="depth_front_camera" parent="base_link">
+		<origin xyz="0.576 0.0 0.0" rpy="0 0 0"/>
+	</xacro:depth_camera>
+</robot>

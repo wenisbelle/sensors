@@ -1,0 +1,30 @@
+FROM nvidia_ros_humble:latest
+
+SHELL [ "/bin/bash" , "-c" ]
+
+# Install catkin tools#
+RUN apt-get update \
+    && apt-get install -y git python3-colcon-common-extensions
+
+RUN apt-get install -y net-tools \
+    && apt-get install -y gedit
+
+
+RUN mkdir -p /tecdron_ws/src \
+    && source /opt/ros/humble/setup.bash 
+    
+COPY ./ /tecdron_ws/src 
+
+WORKDIR /tecdron_ws
+
+RUN rosdep init 
+RUN rosdep update
+RUN rosdep install --from-paths src --ignore-src -r -y
+
+
+RUN source /opt/ros/humble/setup.bash 
+#    && colcon build \
+#    && source /tecdron_ws/install/setup.bash
+
+RUN echo "source /tecdron_ws/install/setup.bash" >> ~/.bashrc
+

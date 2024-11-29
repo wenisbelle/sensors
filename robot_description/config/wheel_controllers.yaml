@@ -1,0 +1,25 @@
+# Controller manager configuration
+controller_manager:
+  ros__parameters:
+    update_rate: 50  # Hz
+
+    # Declare controller name and type
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    wheel_forward_controller:
+      type: forward_command_controller/ForwardCommandController
+
+# Controller properties and joints to use
+wheel_forward_controller:
+  ros__parameters:
+    joints:
+      - tecdron_front_left_wheel_joint
+      - tecdron_front_right_wheel_joint
+      - tecdron_back_left_wheel_joint
+      - tecdron_back_right_wheel_joint
+      - tecdron_front_left_wheel_visual_joint
+      - tecdron_front_right_wheel_visual_joint
+      - tecdron_back_left_wheel_visual_joint
+      - tecdron_back_right_wheel_visual_joint
+    interface_name: velocity

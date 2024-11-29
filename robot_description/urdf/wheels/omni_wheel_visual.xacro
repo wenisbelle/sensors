@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<robot name="wheel"
+  xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Constants -->
+  <xacro:property name="PI" value="3.1415926535897931" />
+  <xacro:property name="wheel_radius" value="0.127" />
+  <xacro:property name="wheel_height" value="0.087" />
+  <xacro:property name="wheel_mass" value="10" />
+  <!-- in kg-->
+
+  <!-- Simple Macro to calculate inertia -->
+  <xacro:macro name="cylinder_inertia" params="m r h">
+    <inertia ixx="${m*(3*r*r+h*h)/12}" ixy = "0" ixz = "0" iyy="${m*r*r/2}" iyz = "0" izz="${m*(3*r*r+h*h)/12}" />
+  </xacro:macro>
+ 
+  <!-- Set up of the Wheel -->
+  <xacro:macro name="omni_wheel_visual" params="prefix parent *origin">
+
+    <link name="${prefix}_wheel_visual_link">
+      <collision>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+          <sphere radius="${0.0005}" />
+        </geometry>
+      </collision>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://robot_description/meshes/wheels/wheel_${prefix}.dae" />
+        </geometry>
+      </visual>
+       <inertial>
+        <mass value="${wheel_mass}" />
+        <origin xyz="0 0 0" />
+        <xacro:cylinder_inertia m="${wheel_mass}" r="${wheel_radius}" h="${wheel_height}" />
+      </inertial>
+    </link>
+    
+    
+    <joint name="${prefix}_wheel_visual_joint" type="continuous">
+      <parent link="${parent}"/>
+      <child link="${prefix}_wheel_visual_link"/>
+      <xacro:insert_block name="origin" />
+      <axis xyz="0 1 0"/>
+    </joint>
+
+    <transmission name="${prefix}_wheel_visual_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_wheel_visual_joint">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      </joint>
+    </transmission>
+
+
+  </xacro:macro>
+    
+</robot>

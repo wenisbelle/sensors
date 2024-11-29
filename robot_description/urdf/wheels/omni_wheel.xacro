@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<robot name="wheel"
+  xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Constants -->
+  <xacro:property name="PI" value="3.1415926535897931" />
+  <xacro:property name="wheel_radius" value="0.127" />
+  <xacro:property name="wheel_height" value="0.036" /><!--0.087-->
+  <xacro:property name="wheel_mass" value="10.0" />
+  <!-- in kg-->
+
+  <!-- Simple Macro to calculate inertia -->
+  <xacro:macro name="cylinder_inertia" params="m r h">
+    <inertia ixx="${m*(3*r*r+h*h)/12}" ixy = "0" ixz = "0" iyy="${m*r*r/2}" iyz = "0" izz="${m*(3*r*r+h*h)/12}" />
+  </xacro:macro>
+
+  <!-- Set up of the Wheel -->
+  <xacro:macro name="omni_wheel" params="prefix parent *origin ">
+
+    <xacro:if value="${prefix == 'tecdron_front_left'}">
+      <xacro:property name="fdir" value="1 -1 0" />
+    </xacro:if>
+    <xacro:if value="${prefix == 'tecdron_front_right'}">
+      <xacro:property name="fdir" value="1 1 0" />
+    </xacro:if>
+    <xacro:if value="${prefix == 'tecdron_back_right'}">
+      <xacro:property name="fdir" value="1 -1 0" />
+    </xacro:if>
+    <xacro:if value="${prefix == 'tecdron_back_left'}">
+      <xacro:property name="fdir" value="1 1 0" />
+    </xacro:if>
+
+    <link name="${prefix}_wheel_link">
+      <collision>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="0.05"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="${wheel_mass}" />
+        <origin xyz="0 0 0" />
+        <xacro:cylinder_inertia m="${wheel_mass}" r="${wheel_radius}" h="${wheel_height}" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+         <sphere radius="0.001"/>
+        </geometry>
+      </visual>
+    </link>
+    
+    <joint name="${prefix}_wheel_joint" type="continuous">
+      <parent link="${parent}"/>
+      <!--parent link="base_link"/-->
+      <child link="${prefix}_wheel_link"/>
+      <xacro:insert_block name="origin" />
+      <axis xyz="0 1 0"/>
+      <limit effort="1000" velocity="21.0" />
+      <dynamics damping="0.001" friction="0.001" />
+    </joint>
+
+
+    <transmission name="${prefix}_wheel_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_wheel_joint">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      </joint>
+    </transmission>
+
+  <gazebo reference="${prefix}_wheel_link" xmlns:ignition="http://ignitionrobotics.org/schema">
+    <collision>
+      <surface>
+        <friction>
+          <ode>
+            <mu>1.0</mu>
+            <mu2>0.0</mu2>
+            <fdir1 ignition:expressed_in="base_link">${fdir}</fdir1>
+          </ode>
+        </friction>
+      </surface>
+    </collision>
+  </gazebo>
+
+
+
+
+  </xacro:macro>
+    
+</robot>
